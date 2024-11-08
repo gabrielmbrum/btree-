@@ -7,9 +7,6 @@
 #define N 5
 #define P 10
 
-const int OVERFLOW = 1;
-const int NOT_OVERFLOW = 0;
-
 #define LICENSE_PLATE_SIZE 8
 #define MODEL_SIZE 20
 #define BRAND_SIZE 20
@@ -17,10 +14,10 @@ const int NOT_OVERFLOW = 0;
 #define STATUS_SIZE 16
 
 typedef struct leafNode {
-  struct leafNode* next;
   char keys[N-1][LICENSE_PLATE_SIZE];
   int num_keys;
   int rrn;
+  int next_rrn;
 } LeafNode;
 
 typedef struct internalNode {
@@ -48,9 +45,21 @@ typedef struct {
 LeafNode* createLeafNode();
 
 /*
-  
+  creates a empty internal node and set it rrn by the global node rrn var
+*/
+InternalNode* createInternalNode();
+
+/*
+  insert in a leaf node and in case of overflow, returns OVERFLOW, other wise returns NOT_OVERFLOW
 */
 int insertInLeafNode(LeafNode** node, const char* key);
+
+void temporaryBuildBTreePlus ();
+
+/*
+  [DEBUG] print leaf node info
+*/
+void printLeafNode(LeafNode* node);
 
 // typedef struct {
 //   char keys[M - 1][LICENSE_PLATE_SIZE];    // Vehicle license plates (keys)
