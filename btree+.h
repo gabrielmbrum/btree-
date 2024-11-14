@@ -23,9 +23,8 @@ typedef struct leafNode {
 typedef struct internalNode {
   char keys[M-1][LICENSE_PLATE_SIZE];
   int children[M];
-  bool is_pseudo_leaf;
+  bool is_pseudo_leaf;                      // true if node's children are leaf nodes
   int num_keys;
-  int leafs[M];
   int rrn;
 } InternalNode;
 
@@ -54,12 +53,28 @@ InternalNode* createInternalNode();
 */
 int insertInLeafNode(LeafNode** node, const char* key);
 
+int insertInInternalNode (InternalNode** node, char *key);
+
 void temporaryBuildBTreePlus ();
+
+void internalNodeSplit (LeafNode** leftChild, InternalNode** parent, LeafNode** rightChild, char* key);
+
+int partition(char arr[N][LICENSE_PLATE_SIZE], int low, int high);
+
+void quickSort(char arr[N][LICENSE_PLATE_SIZE], int low, int high);
+
+void sortKeys(char result[N][LICENSE_PLATE_SIZE], char keys[N-1][LICENSE_PLATE_SIZE], char key[LICENSE_PLATE_SIZE]);
 
 /*
   [DEBUG] print leaf node info
 */
 void printLeafNode(LeafNode* node);
+
+void printInternalNode (InternalNode* node);
+
+void writeLeafNodeToFile (LeafNode* node);
+
+void writeInternalNodeToFile (InternalNode* node);
 
 // typedef struct {
 //   char keys[M - 1][LICENSE_PLATE_SIZE];    // Vehicle license plates (keys)
