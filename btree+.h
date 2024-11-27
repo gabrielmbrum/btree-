@@ -3,8 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define M 4
-#define N 5
+#define M 2
+#define N 3
 #define P 10
 
 #define LICENSE_PLATE_SIZE 8
@@ -12,6 +12,10 @@
 #define BRAND_SIZE 20
 #define CATEGORY_SIZE 15
 #define STATUS_SIZE 16
+
+#define OVERFLOW 1
+#define NOT_OVERFLOW 0
+#define ERROR -1
 
 typedef struct leafNode {
   char keys[N-1][LICENSE_PLATE_SIZE];
@@ -28,6 +32,18 @@ typedef struct internalNode {
   int rrn;
 } InternalNode;
 
+typedef struct node {
+  char keys[N][LICENSE_PLATE_SIZE];
+  int keys_rrn[N];
+  int children[N+1];
+  int max_keys;
+  int num_keys;
+  int rrn;
+  int parent_rrn;
+  int next_node_rrn;
+  bool is_leaf;
+} Node;
+
 typedef struct {
   char licensePlate[LICENSE_PLATE_SIZE];    
   char model[MODEL_SIZE];                   
@@ -37,6 +53,16 @@ typedef struct {
   int km;                              
   char status[STATUS_SIZE];                 
 } Vehicle;
+
+Node* createNode(bool is_leaf);
+
+void writeNodeToFile (Node* node);
+
+void split (Node** leftChild, Node** parent, Node** rightChild, char* key);
+
+Node* searchNode (int rrn);
+
+void printNode(Node *node);
 
 /*
   creates a empty leaf node and set it rrn by the global node rrn var
@@ -59,11 +85,11 @@ void temporaryBuildBTreePlus ();
 
 void internalNodeSplit (LeafNode** leftChild, InternalNode** parent, LeafNode** rightChild, char* key);
 
-int partition(char arr[N][LICENSE_PLATE_SIZE], int low, int high);
+int partition(char arr[N][LICENSE_PLATE_SIZE], int low, int high, int *arr2);
 
-void quickSort(char arr[N][LICENSE_PLATE_SIZE], int low, int high);
+void quickSort(char arr[N][LICENSE_PLATE_SIZE], int low, int high, int *arr2);
 
-void sortKeys(char result[N][LICENSE_PLATE_SIZE], char keys[N-1][LICENSE_PLATE_SIZE], char key[LICENSE_PLATE_SIZE]);
+void sortKeys(int max, char result[max][LICENSE_PLATE_SIZE], int result_rrn[max], char keys[max-1][LICENSE_PLATE_SIZE], char key[LICENSE_PLATE_SIZE], int key_rrn, int keys_rrn[max - 1]);
 
 /*
   [DEBUG] print leaf node info
@@ -84,6 +110,30 @@ void writeInternalNodeToFile (InternalNode* node);
 //   bool isLeaf;                             // Indicates if the node is a leaf
 //   int rrn;                                 // RRN of the node itself
 // } BTreeNode;
+
+typedef struct queueNode {
+  Node *node;
+  bool modified;
+  struct queueNode *next;
+} QueueNode;
+
+typedef struct queue {
+  QueueNode *first;
+  QueueNode *last;
+  int size;
+} Queue;
+
+void initializeQueue(Queue **queue);
+
+void enqueue(Queue** queue, Node* node, bool modified);
+
+void dequeue(Queue** queue);
+
+void moveToLast(Queue** queue, Node* node, bool modified);
+
+void writeAllModified(Queue* queue);
+
+bool contains(Queue* queue, int rrn);
 
 // typedef struct queueNode {
 //   BTreeNode *node;
